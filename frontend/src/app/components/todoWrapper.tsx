@@ -7,9 +7,11 @@ import { TodoColumns } from "./todoTable/todoColumns";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { DialogPortal, DialogTitle } from "@radix-ui/react-dialog";
 import TodoForm from "./todoForm";
+import TodoFilters from "./todoFilters";
 
 const TodoWrapper = () => {
-  const [todos, setTodos] = useState<Todo[]>();
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [filteredTodos, setFiletedTodos] = useState<Todo[]>(todos ?? []);
   const [isOpenEdit, setIsOpenEdit] = useState<boolean | null>(false);
   const [currentEditTodo, setCurrentEditTodo] = useState<Todo | null>(null);
   const todoColumns = TodoColumns({
@@ -24,6 +26,10 @@ const TodoWrapper = () => {
       .then((data) => setTodos(data));
   }, []);
 
+  useEffect(() => {
+    setFiletedTodos(todos);
+  }, [todos]);
+
   function handleDelete(id: number) {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/todos/${id}`, {
       method: "DELETE",
@@ -36,8 +42,6 @@ const TodoWrapper = () => {
   }
 
   function handleStatusChange(id: number, checked: boolean) {
-    console.log(id, checked);
-
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/todos/${id}`, {
       headers: {
         "Content-Type": "application/json",
@@ -61,11 +65,12 @@ const TodoWrapper = () => {
     setIsOpenEdit((prev) => !prev);
     setCurrentEditTodo(todo);
   }
-
   if (!todos) return;
   return (
-    <div className="max-w-200 mx-auto">
-      <TodoTable data={todos} columns={todoColumns} />
+    <div className="max-w-200 mx-auto mt-4">
+      <h1 className="text-2xl uppercase mb-4">Todo</h1>
+      <TodoFilters todos={todos} setTodos={setFiletedTodos} />
+      <TodoTable data={filteredTodos} columns={todoColumns} />
       {isOpenEdit && currentEditTodo && (
         <Dialog open={!!isOpenEdit} onOpenChange={() => setIsOpenEdit(null)}>
           <DialogPortal>

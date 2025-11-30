@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -37,8 +36,6 @@ const TodoForm = ({ todo, action }: TodoFormProps) => {
     },
   });
 
-  console.log(todo);
-
   function onSubmit(values: z.infer<typeof formSchema>) {
     const link =
       action == "POST"
@@ -51,7 +48,7 @@ const TodoForm = ({ todo, action }: TodoFormProps) => {
       },
       method: action,
       body: JSON.stringify(values),
-    }).then((res) => console.log(res));
+    }).catch((err) => console.error(err));
   }
 
   return (
