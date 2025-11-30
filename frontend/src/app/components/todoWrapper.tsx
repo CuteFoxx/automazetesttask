@@ -9,10 +9,7 @@ import TodoForm, { TodoFormProps } from "./todoForm";
 import TodoFilters from "./todoFilters";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -71,9 +68,13 @@ const TodoWrapper = () => {
       .catch((err) => console.error(err));
   }
 
-  function handleTodoCreation(action: TodoFormProps["action"], data: Todo) {
+  function handleTodoFormAction(action: TodoFormProps["action"], data: Todo) {
     if (action == "POST") {
       setTodos([...todos, data]);
+    } else if (action === "PATCH") {
+      setTodos((prev) =>
+        prev.map((todo) => (todo.id === data.id ? data : todo))
+      );
     }
   }
 
@@ -88,7 +89,7 @@ const TodoWrapper = () => {
         <h1 className="text-2xl uppercase mb-4">Todo</h1>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline">
+            <Button>
               <PlusIcon /> Add todo
             </Button>
           </DialogTrigger>
@@ -96,7 +97,7 @@ const TodoWrapper = () => {
             <DialogHeader>
               <DialogTitle>Create Todo</DialogTitle>
             </DialogHeader>
-            <TodoForm action="POST" handleResult={handleTodoCreation} />
+            <TodoForm action="POST" handleResult={handleTodoFormAction} />
           </DialogContent>
         </Dialog>
       </div>
@@ -109,7 +110,11 @@ const TodoWrapper = () => {
               <DialogHeader>
                 <DialogTitle>Edit Todo</DialogTitle>
               </DialogHeader>
-              <TodoForm todo={currentEditTodo} action="PATCH" />
+              <TodoForm
+                todo={currentEditTodo}
+                action="PATCH"
+                handleResult={handleTodoFormAction}
+              />
             </DialogContent>
           </DialogPortal>
         </Dialog>
