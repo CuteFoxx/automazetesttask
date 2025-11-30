@@ -8,10 +8,14 @@ import {
 } from "@/components/ui/table";
 import {
   ColumnDef,
+  SortingState,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { useState } from "react";
 
 interface TodoTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -22,10 +26,19 @@ export function TodoTable<TData, TValue>({
   columns,
   data,
 }: TodoTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "priority", desc: true },
+  ]);
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
   });
 
   return (
