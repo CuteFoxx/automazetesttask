@@ -56,6 +56,8 @@ const TodoForm = ({ todo, action, handleResult }: TodoFormProps) => {
         if (handleResult) {
           handleResult(action, todo);
         }
+
+        form.reset();
       })
       .catch((err) => console.error(err));
   }
