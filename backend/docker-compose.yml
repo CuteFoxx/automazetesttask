@@ -1,0 +1,42 @@
+services:
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: debug
+    volumes:
+      - .:/src
+      - /src/node_modules
+    env_file:
+      - .env
+    ports:
+      - '${PORT}:${PORT}'
+      - '${DEBUG_PORT}:${DEBUG_PORT}'
+    depends_on:
+      - db
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    ports:
+      - '${DB_PORT}:5432'
+  prisma-studio:
+    image: node:24-alpine3.22
+    working_dir: /src
+    volumes:
+      - .:/src
+    command: npx prisma@6 studio --port ${PRISMA_STUDIO_PORT} --browser none
+    ports:
+      - '${PRISMA_STUDIO_PORT}:${PRISMA_STUDIO_PORT}'
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - api
+volumes:
+  postgres_data:
