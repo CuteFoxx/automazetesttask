@@ -25,18 +25,5 @@ services:
       - postgres_data:/var/lib/postgresql
     ports:
       - '${DB_PORT}:5432'
-  prisma-studio:
-    image: node:24-alpine3.22
-    working_dir: /src
-    volumes:
-      - .:/src
-    command: npx prisma@6 studio --port ${PRISMA_STUDIO_PORT} --browser none
-    ports:
-      - '${PRISMA_STUDIO_PORT}:${PRISMA_STUDIO_PORT}'
-    env_file:
-      - .env
-    depends_on:
-      - db
-      - api
 volumes:
   postgres_data:

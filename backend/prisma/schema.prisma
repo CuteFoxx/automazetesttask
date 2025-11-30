@@ -7,9 +7,9 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Task {
-    id       Int     @id @default(autoincrement())
+model Todo {
+    id       Int      @id @default(autoincrement())
     name     String
-    status   Boolean
-    priority Int
+    status   Boolean? @default(false)
+    priority Int?     @default(0)
 }
