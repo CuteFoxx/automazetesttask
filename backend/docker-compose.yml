@@ -4,10 +4,9 @@ services:
       dockerfile: Dockerfile
       context: .
       target: ${BUILD_TARGET}
-    volumes:
-      - .:/src
-      - /src/node_modules
-        - build:/src/build
+    # volumes:
+    # - .:/src
+    # - /src/node_modules
     env_file:
       - .env
     ports:
@@ -15,6 +14,7 @@ services:
       - '${DEBUG_PORT}:${DEBUG_PORT}'
     depends_on:
       - db
+    restart: on-failure
   db:
     image: postgres
     restart: always
