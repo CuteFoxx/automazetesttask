@@ -4,11 +4,21 @@ import { useEffect, useState } from "react";
 import { Todo } from "../types/todo";
 import { TodoTable } from "./todoTable/todoTable";
 import { TodoColumns } from "./todoTable/todoColumns";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
-import { DialogPortal, DialogTitle } from "@radix-ui/react-dialog";
-import TodoForm from "./todoForm";
+import { DialogPortal } from "@radix-ui/react-dialog";
+import TodoForm, { TodoFormProps } from "./todoForm";
 import TodoFilters from "./todoFilters";
-
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { PlusIcon } from "lucide-react";
 const TodoWrapper = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [filteredTodos, setFiletedTodos] = useState<Todo[]>(todos ?? []);
@@ -61,6 +71,12 @@ const TodoWrapper = () => {
       .catch((err) => console.error(err));
   }
 
+  function handleTodoCreation(action: TodoFormProps["action"], data: Todo) {
+    if (action == "POST") {
+      setTodos([...todos, data]);
+    }
+  }
+
   function onEdit(todo: Todo) {
     setIsOpenEdit((prev) => !prev);
     setCurrentEditTodo(todo);
@@ -68,7 +84,22 @@ const TodoWrapper = () => {
   if (!todos) return;
   return (
     <div className="max-w-200 mx-auto mt-4">
-      <h1 className="text-2xl uppercase mb-4">Todo</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl uppercase mb-4">Todo</h1>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">
+              <PlusIcon /> Add todo
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Create Todo</DialogTitle>
+            </DialogHeader>
+            <TodoForm action="POST" handleResult={handleTodoCreation} />
+          </DialogContent>
+        </Dialog>
+      </div>
       <TodoFilters todos={todos} setTodos={setFiletedTodos} />
       <TodoTable data={filteredTodos} columns={todoColumns} />
       {isOpenEdit && currentEditTodo && (
@@ -77,8 +108,8 @@ const TodoWrapper = () => {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Edit Todo</DialogTitle>
-                <TodoForm todo={currentEditTodo} action="PATCH" />
               </DialogHeader>
+              <TodoForm todo={currentEditTodo} action="PATCH" />
             </DialogContent>
           </DialogPortal>
         </Dialog>

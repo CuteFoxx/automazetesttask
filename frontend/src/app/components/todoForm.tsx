@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Todo } from "../types/todo";
 import { Checkbox } from "@/components/ui/checkbox";
+import { SetStateAction } from "react";
 
 const formSchema = z.object({
   name: z.string().min(3),
@@ -21,12 +22,13 @@ const formSchema = z.object({
   priority: z.number().min(0),
 });
 
-interface TodoFormProps {
+export interface TodoFormProps {
   action: "POST" | "PATCH";
   todo?: Todo;
+  handleResult?: (action: TodoFormProps["action"], res: Todo) => void;
 }
 
-const TodoForm = ({ todo, action }: TodoFormProps) => {
+const TodoForm = ({ todo, action, handleResult }: TodoFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,7 +50,14 @@ const TodoForm = ({ todo, action }: TodoFormProps) => {
       },
       method: action,
       body: JSON.stringify(values),
-    }).catch((err) => console.error(err));
+    })
+      .then((res) => res.json())
+      .then((todo) => {
+        if (handleResult) {
+          handleResult(action, todo);
+        }
+      })
+      .catch((err) => console.error(err));
   }
 
   return (
@@ -74,7 +83,12 @@ const TodoForm = ({ todo, action }: TodoFormProps) => {
             <FormItem>
               <FormLabel>Todo priority</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="priority" {...field} />
+                <Input
+                  type="number"
+                  placeholder="priority"
+                  value={field.value}
+                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
