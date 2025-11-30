@@ -3,7 +3,7 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
-      target: debug
+      target: ${BUILD_TARGET}
     volumes:
       - .:/src
       - /src/node_modules
