@@ -1,17 +1,78 @@
 import { Todo } from "@/app/types/todo";
 import { ColumnDef } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
-export const TodoColumns: ColumnDef<Todo>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-  },
-  {
-    accessorKey: "priority",
-    header: "Priority",
-  },
-];
+export function TodoColumns(options: {
+  onDelete: (id: number) => void;
+  onStatusChange: (id: number, checked: boolean) => void;
+  onEdit?: (todo: Todo) => void;
+}): ColumnDef<Todo>[] {
+  const { onDelete, onStatusChange, onEdit } = options;
+
+  return [
+    {
+      accessorKey: "name",
+      header: "Name",
+    },
+    {
+      id: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const todo = row.original as Todo;
+
+        return (
+          <Checkbox
+            checked={todo.status}
+            onCheckedChange={(checked) =>
+              onStatusChange(todo.id, checked as boolean)
+            }
+          />
+        );
+      },
+    },
+    {
+      accessorKey: "priority",
+      header: "Priority",
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const todo = row.original as Todo;
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => onEdit && onEdit(todo)}>
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-red-500"
+                onClick={() => onDelete(todo.id)}
+              >
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
+    },
+  ];
+}

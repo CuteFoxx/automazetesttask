@@ -9,8 +9,10 @@ export class CreateTodoDto {
   @IsOptional()
   status: boolean;
 
+  @Transform(({ value }: { value: string }) =>
+    value === undefined ? undefined : parseInt(value),
+  )
   @IsInt()
   @IsOptional()
-  @Transform(({ value }: { value: string }) => parseInt(value))
   priority: number;
 }

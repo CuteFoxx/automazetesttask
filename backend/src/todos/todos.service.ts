@@ -8,7 +8,7 @@ export class TodosService {
   constructor(private prisma: PrismaService) {}
 
   async find(where?: Prisma.TodoWhereInput): Promise<Todo[]> {
-    return this.prisma.todo.findMany({ where });
+    return this.prisma.todo.findMany({ where, orderBy: { id: 'asc' } });
   }
 
   async findOne(where: Prisma.TodoWhereUniqueInput): Promise<Todo | null> {
